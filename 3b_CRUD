@@ -1,0 +1,36 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const app = express();
+app.use(express.json());
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/studentDB');
+
+const User = mongoose.model('User', { name: String, email: String });
+
+// CREATE (Register)
+app.post('/user', async (req, res) => {
+    const user = new User(req.body);
+    await user.save();
+    res.send("User Created");
+});
+
+// READ (Profile)
+app.get('/user/:id', async (req, res) => {
+    const user = await User.findById(req.params.id);
+    res.json(user);
+});
+
+// UPDATE
+app.put('/user/:id', async (req, res) => {
+    await User.findByIdAndUpdate(req.params.id, req.body);
+    res.send("User Updated");
+});
+
+// DELETE
+app.delete('/user/:id', async (req, res) => {
+    await User.findByIdAndDelete(req.params.id);
+    res.send("User Deleted");
+});
+
+app.listen(3000, () => console.log('API running'));
